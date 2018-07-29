@@ -14,41 +14,57 @@ endfunc
 
 func! s:register_source() abort
     let server_names = lsp#get_server_names()
-    for server_name in server_names
-        if !has_key(s:servers, server_name)
-            let init_capabilities = lsp#get_server_capabilities(server_name)
-            if has_key(init_capabilities, 'completionProvider')
-                " TODO: support triggerCharacters
-                let name = s:get_source_name(server_name)
-                let source_opt = {
-                    \ 'name': name,
-                    \ 'priority': 9,
-                    \ 'mark': 'lsp',
-                    \ 'on_complete': function('s:on_complete', [server_name]),
-                    \ 'complete_pattern': ['.'],
-                    \ }
-                let server = lsp#get_server_info(server_name)
-                if has_key(server, 'whitelist')
-                    let source_opt['scope'] = server['whitelist']
-                endif
-                call ncm2#register_source(source_opt)
-                let s:servers[server_name] = 1
-            else
-                let s:servers[server_name] = 0
-            endif
+    for svr_name in server_names
+        if has_key(s:servers, svr_name)
+            continue
         endif
+        let capabilities = lsp#get_server_capabilities(svr_name)
+        let s:servers[svr_name] = has_key(capabilities, 'completionProvider')
+        if !s:servers[svr_name]
+            continue
+        endif
+        let trigger_chars = get(capabilities.completionProvider,
+                    \ 'triggerCharacters', [])
+        let patterns = ncm2_vim_lsp#get_complete_pattern(trigger_chars)
+        let source_name = s:get_source_name(svr_name)
+        let source_opt = {
+            \ 'name': source_name,
+            \ 'priority': 9,
+            \ 'mark': 'lsp',
+            \ 'on_complete': function('s:on_complete', [svr_name]),
+            \ 'complete_pattern': patterns,
+            \ }
+        let server = lsp#get_server_info(svr_name)
+        if has_key(server, 'whitelist')
+            let source_opt['scope'] = server['whitelist']
+        endif
+        call ncm2#register_source(source_opt)
     endfor
 endfunc
 
+func! ncm2_vim_lsp#get_complete_pattern(trigger_chars)
+    if empty(a:trigger_chars)
+        return []
+    endif
+    py3 << EOF
+import vim, re
+complete_pattern = []
+chars = vim.eval('a:trigger_chars')
+for c in chars:
+    complete_pattern.append(re.escape(c))
+EOF
+    return py3eval('complete_pattern')
+endfunc
+
 func! s:unregister_source() abort
-    let l:server_names = lsp#get_server_names()
-    for l:server_name in l:server_names
-        if has_key(s:servers, l:server_name)
-            let l:name = s:get_source_name(l:server_name)
-            if s:servers[l:server_name]
-                call ncm2#unregister_source(l:name)
+    let server_names = lsp#get_server_names()
+    for server_name in server_names
+        if has_key(s:servers, server_name)
+            let name = s:get_source_name(server_name)
+            if s:servers[server_name]
+                call ncm2#unregister_source(name)
             endif
-            unlet s:servers[l:server_name]
+            unlet s:servers[server_name]
         endif
     endfor
 endfunc
