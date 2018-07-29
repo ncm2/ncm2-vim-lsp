@@ -46,8 +46,7 @@ func! s:unregister_source() abort
         if has_key(s:servers, l:server_name)
             let l:name = s:get_source_name(l:server_name)
             if s:servers[l:server_name]
-                " TODO unregister_source
-                call ncm2#disable_source(l:name)
+                call ncm2#unregister_source(l:name)
             endif
             unlet s:servers[l:server_name]
         endif
