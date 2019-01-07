@@ -8,10 +8,6 @@ let s:servers = {} " { server_name: 1 }
 au User lsp_server_init call s:register_source()
 au User lsp_server_exit call s:unregister_source()
 
-func! s:get_source_name(server_name) abort
-    return 'ncm2_vim_lsp_' . a:server_name
-endfunc
-
 func! s:register_source() abort
     let server_names = lsp#get_server_names()
     for svr_name in server_names
@@ -26,7 +22,7 @@ func! s:register_source() abort
         let trigger_chars = get(capabilities.completionProvider,
                     \ 'triggerCharacters', [])
         let patterns = ncm2_vim_lsp#get_complete_pattern(trigger_chars)
-        let source_name = s:get_source_name(svr_name)
+        let source_name = svr_name
         let source_opt = {
             \ 'name': source_name,
             \ 'priority': 9,
@@ -60,7 +56,7 @@ func! s:unregister_source() abort
     let server_names = lsp#get_server_names()
     for server_name in server_names
         if has_key(s:servers, server_name)
-            let name = s:get_source_name(server_name)
+            let name = server_name
             if s:servers[server_name]
                 call ncm2#unregister_source(name)
             endif
