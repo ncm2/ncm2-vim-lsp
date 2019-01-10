@@ -26,7 +26,7 @@ func! s:register_source() abort
         let source_opt = {
             \ 'name': source_name,
             \ 'priority': 9,
-            \ 'mark': 'lsp',
+            \ 'mark': svr_name,
             \ 'on_complete': function('s:on_complete', [svr_name]),
             \ 'complete_pattern': patterns,
             \ }
