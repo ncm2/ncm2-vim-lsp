@@ -27,6 +27,7 @@ func! s:register_source() abort
             \ 'name': source_name,
             \ 'priority': 9,
             \ 'mark': svr_name,
+            \ 'sorter': 'none',
             \ 'on_complete': function('s:on_complete', [svr_name]),
             \ 'complete_pattern': patterns,
             \ }
