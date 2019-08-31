@@ -111,17 +111,9 @@ func! ncm2_vim_lsp#completionitem_resolve(user_data, item) abort
     call lsp#send_request(a:user_data.vim_lsp.server_name, {
         \ 'method': 'completionItem/resolve',
         \ 'params': a:item,
+        \ 'sync': 1,
         \ 'on_notification': function('s:on_resolve_result', [result]),
         \ })
-    let i = 0
-    " FIXME sync call should be implemented in vim-lsp
-    while l:i < 40
-        sleep 25m
-        if !empty(result)
-            break
-        endif
-        let i += 1
-    endwhile
     let ret = get(result, 'data', {})
     echom 'ret: ' . json_encode(ret)
     return ret
