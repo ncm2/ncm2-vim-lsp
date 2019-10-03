@@ -94,7 +94,7 @@ func! s:on_completion_result(server_name, ctx, data) abort
 
     " fill user_data
     let lspitems = deepcopy(items)
-    call map(items, 'lsp#omni#get_vim_completion_item(v:val)')
+    call map(items, 'lsp#omni#get_vim_completion_item(v:val, a:server_name)')
     let i = 0
     while l:i < len(items)
         let ud = {}
