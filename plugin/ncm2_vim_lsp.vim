@@ -82,29 +82,14 @@ func! s:on_completion_result(server_name, ctx, data) abort
         return
     endif
 
-    let result = a:data['response']['result']
+    let options = {
+    	\ 'server': lsp#get_server_info(a:server_name),
+    	\ 'response': a:data['response'],
+    	\ 'position': lsp#get_position()
+		\ }
+    let result = lsp#omni#get_vim_completion_items(options)
 
-    if type(result) == type([])
-        let items = result
-        let incomplete = 0
-    else
-        let items = result['items']
-        let incomplete = result['isIncomplete']
-    endif
-
-    " fill user_data
-    let lspitems = deepcopy(items)
-    call map(items, 'lsp#omni#get_vim_completion_item(v:val, a:server_name)')
-    let i = 0
-    while l:i < len(items)
-        let ud = {}
-        let ud['lspitem'] = lspitems[i]
-        let ud['vim_lsp'] = {'server_name': a:server_name}
-        let items[i].user_data = ud
-        let i += 1
-    endwhile
-
-    call ncm2#complete(a:ctx, a:ctx.startccol, items, incomplete)
+    call ncm2#complete(a:ctx, a:ctx.startccol, result['items'], result['incomplete'])
 endfunc
 
 func! ncm2_vim_lsp#completionitem_resolve(user_data, item) abort
