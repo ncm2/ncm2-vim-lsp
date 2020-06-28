@@ -35,6 +35,10 @@ func! s:register_source() abort
         if has_key(server, 'whitelist')
             let source_opt['scope'] = server['whitelist']
         endif
+        " whitelist is deprecated https://github.com/ncm2/ncm2-vim-lsp/issues/14
+        if has_key(server, 'allowlist')
+            let source_opt['scope'] = server['allowlist']
+        endif
         call ncm2#register_source(source_opt)
     endfor
 endfunc
