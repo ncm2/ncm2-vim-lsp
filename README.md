@@ -8,7 +8,6 @@ This plugin connect the completion support between
 ## Installation
 
 ```vim
-Plug 'prabirshrestha/async.vim'
 Plug 'prabirshrestha/vim-lsp'
 Plug 'ncm2/ncm2-vim-lsp'
 ```
