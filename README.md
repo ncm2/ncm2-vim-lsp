@@ -17,3 +17,8 @@ Plug 'ncm2/ncm2-vim-lsp'
 For registering language servers, please read the documentation of
 [vim-lsp](https://github.com/prabirshrestha/vim-lsp#registering-servers).
 
+Particular servers can be excluded by including their name (as configured
+in vim-lsp) in the list `g:ncm2_vim_lsp_blocklist`. e.g.
+```vim
+let g:ncm2_vim_lsp_blocklist = ['jedi-language-server','efm-language-server']
+```
