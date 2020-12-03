@@ -3,6 +3,8 @@ if exists('g:ncm2_vim_lsp')
 endif
 let g:ncm2_vim_lsp = 1
 
+let g:ncm2_vim_lsp_blocklist = get(g:, 'ncm2_vim_lsp_blocklist', [])
+
 let s:servers = {} " { server_name: 1 }
 
 au User lsp_server_init call s:register_source()
@@ -11,7 +13,7 @@ au User lsp_server_exit call s:unregister_source()
 func! s:register_source() abort
     let server_names = lsp#get_server_names()
     for svr_name in server_names
-        if has_key(s:servers, svr_name)
+        if has_key(s:servers, svr_name) || (index(g:ncm2_vim_lsp_blocklist, svr_name) > -1)
             continue
         endif
         let capabilities = lsp#get_server_capabilities(svr_name)
